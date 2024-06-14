@@ -1,9 +1,9 @@
-#include "rbf_gnss_ins_driver/converter.h"
+#include "rbf_gnss_ins_autoware_driver/converter.h"
 #include <cmath>
 #include <rclcpp/clock.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 
-namespace rbf_gnss_ins_driver{
+namespace rbf_gnss_ins_autoware_driver{
     constexpr double accel_scale_factor = 0.000000186;
     constexpr double hz_to_second = 100;
     constexpr double gyro_scale_factor = 0.000001006;
@@ -44,16 +44,16 @@ namespace rbf_gnss_ins_driver{
         return static_cast<double>(raw_acc) * accel_scale_factor * hz_to_second;;
     }
 
-    rbf_gnss_ins_driver::msg::ImuStatus Converter::raw_imu_to_imu_status(const RawImu& raw_imu, std::string frame_id) {
-        rbf_gnss_ins_driver::msg::ImuStatus imu;
+    rbf_gnss_ins_autoware_driver::msg::ImuStatus Converter::raw_imu_to_imu_status(const RawImu& raw_imu, std::string frame_id) {
+        rbf_gnss_ins_autoware_driver::msg::ImuStatus imu;
         imu.header = create_header(std::move(frame_id));
 
         imu.status = raw_imu.imu_status & 0x0000FFFFU;
         return imu;
     }
 
-    rbf_gnss_ins_driver::msg::Heading Converter::heading_to_msg(const UniHeading& heading, std::string frame_id) {
-        rbf_gnss_ins_driver::msg::Heading heading_msg;
+    rbf_gnss_ins_autoware_driver::msg::Heading Converter::heading_to_msg(const UniHeading& heading, std::string frame_id) {
+        rbf_gnss_ins_autoware_driver::msg::Heading heading_msg;
         heading_msg.header = create_header(std::move(frame_id));
         heading_msg.heading = heading.heading;
         heading_msg.std_dev_heading = heading.std_dev_heading;
@@ -71,8 +71,8 @@ namespace rbf_gnss_ins_driver{
         return heading_msg;
     }
 
-    rbf_gnss_ins_driver::msg::GnssStatus Converter::gnss_pos_to_gnss_status_msg(const BestGnssPos& gnss_pos, std::string frame_id) {
-        rbf_gnss_ins_driver::msg::GnssStatus gnss_status_msg;
+    rbf_gnss_ins_autoware_driver::msg::GnssStatus Converter::gnss_pos_to_gnss_status_msg(const BestGnssPos& gnss_pos, std::string frame_id) {
+        rbf_gnss_ins_autoware_driver::msg::GnssStatus gnss_status_msg;
         gnss_status_msg.header = create_header(std::move(frame_id));
         gnss_status_msg.sol_status = gnss_pos.sol_status;
         gnss_status_msg.pos_type = gnss_pos.pos_type;
@@ -82,8 +82,8 @@ namespace rbf_gnss_ins_driver{
         return gnss_status_msg;
     }
 
-    rbf_gnss_ins_driver::msg::GnssVel Converter::gnss_vel_to_msg(const BestGnssVel& gnss_vel, std::string frame_id) {
-        rbf_gnss_ins_driver::msg::GnssVel gnss_vel_msg;
+    rbf_gnss_ins_autoware_driver::msg::GnssVel Converter::gnss_vel_to_msg(const BestGnssVel& gnss_vel, std::string frame_id) {
+        rbf_gnss_ins_autoware_driver::msg::GnssVel gnss_vel_msg;
         gnss_vel_msg.header = create_header(std::move(frame_id));
         gnss_vel_msg.sol_status = gnss_vel.sol_status;
         gnss_vel_msg.vel_type = gnss_vel.vel_type;
@@ -95,8 +95,8 @@ namespace rbf_gnss_ins_driver{
         return gnss_vel_msg;
     }
 
-    rbf_gnss_ins_driver::msg::Ins Converter::ins_to_msg(const InsPvax& ins_pva, std::string frame_id) {
-        rbf_gnss_ins_driver::msg::Ins ins_msg;
+    rbf_gnss_ins_autoware_driver::msg::Ins Converter::ins_to_msg(const InsPvax& ins_pva, std::string frame_id) {
+        rbf_gnss_ins_autoware_driver::msg::Ins ins_msg;
         ins_msg.header = create_header(std::move(frame_id));
         ins_msg.ins_status = ins_pva.ins_status;
         ins_msg.pos_type = ins_pva.pos_type;
@@ -181,8 +181,8 @@ namespace rbf_gnss_ins_driver{
         return nav_sat_fix_msg;
     }
 
-    rbf_gnss_ins_driver::msg::ECEF Converter::ecef_to_msg(const ECEF& ecef, std::string frame_id) {
-        rbf_gnss_ins_driver::msg::ECEF ecef_msg;
+    rbf_gnss_ins_autoware_driver::msg::ECEF Converter::ecef_to_msg(const ECEF& ecef, std::string frame_id) {
+        rbf_gnss_ins_autoware_driver::msg::ECEF ecef_msg;
         ecef_msg.header = create_header(std::move(frame_id));
         ecef_msg.sol_status = ecef.sol_status;
         ecef_msg.pos_type = ecef.pos_type;
@@ -350,4 +350,23 @@ namespace rbf_gnss_ins_driver{
         twist_msg.twist.covariance[14] = ins_pva.std_dev_up_velocity * ins_pva.std_dev_up_velocity;
         return twist_msg;
     }
-} // namespace rbf_gnss_ins_driver
+
+    autoware_sensing_msgs::msg::GnssInsOrientationStamped Converter::ins_to_orientation_stamped_msg(const InsPvax& ins_pva, std::string frame_id) {
+        autoware_sensing_msgs::msg::GnssInsOrientationStamped orientation_msg;
+        orientation_msg.header = create_header(std::move(frame_id));
+        
+        tf2::Quaternion q;
+        q.setRPY(degree_to_radian(ins_pva.pitch), degree_to_radian(ins_pva.roll), degree_to_radian(-ins_pva.azimuth));
+        orientation_msg.orientation.orientation.x = q.getX();
+        orientation_msg.orientation.orientation.y = q.getY();
+        orientation_msg.orientation.orientation.z = q.getZ();
+        orientation_msg.orientation.orientation.w = q.getW();
+
+        orientation_msg.orientation.rmse_rotation_x = ins_pva.std_dev_pitch * ins_pva.std_dev_pitch;
+        orientation_msg.orientation.rmse_rotation_y = ins_pva.std_dev_roll * ins_pva.std_dev_roll;
+        orientation_msg.orientation.rmse_rotation_z = ins_pva.std_dev_azimuth * ins_pva.std_dev_azimuth;
+
+        return orientation_msg;
+    }
+        
+    } // namespace rbf_gnss_ins_autoware_driver

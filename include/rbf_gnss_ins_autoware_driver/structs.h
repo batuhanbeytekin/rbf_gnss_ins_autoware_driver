@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-namespace rbf_gnss_ins_driver {
+namespace rbf_gnss_ins_autoware_driver {
     #pragma pack(push, 1)
     struct Header
     {

@@ -1,12 +1,15 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>rbf_gnss_ins_driver</name>
+  <name>rbf_gnss_ins_autoware_driver</name>
   <version>1.0.0</version>
   <description>RBF GNSS INS DRIVER</description>
   <maintainer email="batuhan.beytekin@robeff.com">batu</maintainer>
   <maintainer email="support@robeff.com">robeff</maintainer>
   <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <buildtool_depend>autoware_cmake</buildtool_depend>
 
   <depend>ament_cmake </depend>
   <depend>rclcpp </depend>
@@ -23,6 +26,7 @@
   <depend>mavros_msgs </depend>
   <depend>eigen </depend>
   <depend>diagnostic_updater </depend>
+  <depend>autoware_sensing_msgs </depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

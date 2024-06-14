@@ -19,7 +19,7 @@ def generate_launch_description():
     composable_node_descriptions=[
         ComposableNode(
             package='rbf_gnss_ins_driver',
-            plugin='rbf_gnss_ins_driver::GnssInsDriver',
+            plugin='rbf_gnss_ins_autoware_driver::GnssInsDriver',
             name='rbf_gnss_ins_driver',
             parameters=[config],
             extra_arguments=[{'use_intra_process_comms': True}],

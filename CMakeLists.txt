@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 3.8)
-project(rbf_gnss_ins_driver)
+project(rbf_gnss_ins_autoware_driver)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
-# Find dependencies
-find_package(ament_cmake REQUIRED)
+
+# find dependencies
+find_package(autoware_cmake REQUIRED)
+autoware_package()
+
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(nav_msgs REQUIRED)
@@ -66,6 +69,7 @@ ament_target_dependencies(rbf_gnss_ins_component
   tf2
   tf2_ros
   diagnostic_updater
+  autoware_sensing_msgs
 )
 
 
@@ -74,7 +78,7 @@ target_link_libraries(rbf_gnss_ins_component "${cpp_typesupport_target}")
 
 rclcpp_components_register_node(
 rbf_gnss_ins_component
-PLUGIN "rbf_gnss_ins_driver::GnssInsDriver"
+PLUGIN "rbf_gnss_ins_autoware_driver::GnssInsDriver"
 EXECUTABLE rbf_gnss_ins_component_driver
 )
 
@@ -101,4 +105,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_package()
+ament_auto_package(INSTALL_TO_SHARE 
+  launch
+  config
+)

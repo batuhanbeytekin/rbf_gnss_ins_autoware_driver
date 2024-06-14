@@ -1,8 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
-#include "rbf_gnss_ins_driver/rbf_gnss_ins_driver.h"
+#include "rbf_gnss_ins_autoware_driver/rbf_gnss_ins_driver.h"
 
-
-namespace rbf_gnss_ins_driver {
+namespace rbf_gnss_ins_autoware_driver {
     GnssInsDriver::GnssInsDriver(const rclcpp::NodeOptions &options): Node("rbf_gnss_ins_driver", options){
         load_parameters();
         init_publishers();
@@ -76,13 +75,13 @@ namespace rbf_gnss_ins_driver {
 
     void GnssInsDriver::init_publishers(){
         /*CUSTOM MSGS PUBLISHERS*/
-        pub_ins_ = this->create_publisher<rbf_gnss_ins_driver::msg::Ins>("/robins/raw/ins", 10);
-        pub_heading_ = this->create_publisher<rbf_gnss_ins_driver::msg::Heading>("/robins/raw/heading", 10);
-        pub_ecef_ = this->create_publisher<rbf_gnss_ins_driver::msg::ECEF>("/robins/raw/ecef", 10);
-        pub_imu_status_ = this->create_publisher<rbf_gnss_ins_driver::msg::ImuStatus>("/robins/status/imu_status", 10);
-        pub_gnss_vel_ = this->create_publisher<rbf_gnss_ins_driver::msg::GnssVel>("/robins/raw/gnss_vel", 10);
-        pub_gnss_status_ = this->create_publisher<rbf_gnss_ins_driver::msg::GnssStatus>("/robins/status/gnss_status", 10);
-        pub_rtcm_status_ = this->create_publisher<rbf_gnss_ins_driver::msg::RTCMStatus>("/robins/status/rtcm_status", 10);
+        pub_ins_ = this->create_publisher<rbf_gnss_ins_autoware_driver::msg::Ins>("/robins/raw/ins", 10);
+        pub_heading_ = this->create_publisher<rbf_gnss_ins_autoware_driver::msg::Heading>("/robins/raw/heading", 10);
+        pub_ecef_ = this->create_publisher<rbf_gnss_ins_autoware_driver::msg::ECEF>("/robins/raw/ecef", 10);
+        pub_imu_status_ = this->create_publisher<rbf_gnss_ins_autoware_driver::msg::ImuStatus>("/robins/status/imu_status", 10);
+        pub_gnss_vel_ = this->create_publisher<rbf_gnss_ins_autoware_driver::msg::GnssVel>("/robins/raw/gnss_vel", 10);
+        pub_gnss_status_ = this->create_publisher<rbf_gnss_ins_autoware_driver::msg::GnssStatus>("/robins/status/gnss_status", 10);
+        pub_rtcm_status_ = this->create_publisher<rbf_gnss_ins_autoware_driver::msg::RTCMStatus>("/robins/status/rtcm_status", 10);
 
         /*STD MSGS without INS*/
         pub_imu_raw_ = this->create_publisher<sensor_msgs::msg::Imu>("/robins/raw/imu", 10);
@@ -96,6 +95,9 @@ namespace rbf_gnss_ins_driver {
         pub_twist_ = this->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>(config_params_.topics_.twist_topic_, 10);
         pub_imu_ = this->create_publisher<sensor_msgs::msg::Imu>(config_params_.topics_.imu_topic_, 10);
         
+        /*AUTOWARE ORIENTATION MSGS PUBLISHERS*/
+        pub_gnss_ins_orientation_ = this->create_publisher<autoware_sensing_msgs::msg::GnssInsOrientationStamped>("/gnss_ins_orientation", 10);
+
         /*ODOM PUBLISHERS IF ENABLED*/
         if(config_params_.odometry_.use_odometry_){
             pub_odometry_ = this->create_publisher<nav_msgs::msg::Odometry>(config_params_.topics_.odometry_topic_, 10);
@@ -180,6 +182,11 @@ namespace rbf_gnss_ins_driver {
                 auto twist_msg = converter_->ins_to_twist_msg(ins_pva_, raw_imu_, config_params_.frames_.gnss_frame_);
                 pub_twist_->publish(twist_msg);
             }
+
+            if(Converter::is_ins_active(ins_pva_.ins_status)){
+                auto orientation_msg = converter_->ins_to_orientation_stamped_msg(ins_pva_, config_params_.frames_.gnss_frame_);
+                pub_gnss_ins_orientation_->publish(orientation_msg);
+            }
         }
     }
 
@@ -193,7 +200,7 @@ namespace rbf_gnss_ins_driver {
             RCLCPP_ERROR(get_logger(), e.what());
         }
 
-        auto rtcm_status_msg = rbf_gnss_ins_driver::msg::RTCMStatus();
+        auto rtcm_status_msg = rbf_gnss_ins_autoware_driver::msg::RTCMStatus();
         rtcm_status_msg.header.stamp = this->now();
         rtcm_status_msg.received_msg_size = rtcm_status_.received_size_;
         rtcm_status_msg.transmitted_msg_size = rtcm_status_.transmitted_size_;
@@ -218,8 +225,8 @@ namespace rbf_gnss_ins_driver {
         stat.add("INS_STATUS", Converter::is_ins_active(ins_pva_.ins_status) ? "ACTIVE" : "INACTIVE");
     }
 
-}  // namespace rbf_gnss_ins_driver
+}  // namespace rbf_gnss_ins_autoware_driver
 
 // Register the node as a component
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(rbf_gnss_ins_driver::GnssInsDriver)
+RCLCPP_COMPONENTS_REGISTER_NODE(rbf_gnss_ins_autoware_driver::GnssInsDriver)

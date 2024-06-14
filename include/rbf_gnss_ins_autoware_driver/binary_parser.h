@@ -4,9 +4,9 @@
 #include <cstdint>
 #include <functional>
 #include <vector>
-#include <rbf_gnss_ins_driver/structs.h>
+#include <rbf_gnss_ins_autoware_driver/structs.h>
 
-namespace rbf_gnss_ins_driver {
+namespace rbf_gnss_ins_autoware_driver {
     class BinaryParser {
     public:
         enum class MessageId : std::uint16_t {
@@ -48,6 +48,6 @@ namespace rbf_gnss_ins_driver {
         uint8_t raw_data_[512];
     };
 
-} // namespace rbf_gnss_ins_driver
+} // namespace rbf_gnss_ins_autoware_driver
 
 #endif // RBF_GNSS_INS_DRIVER_BINARY_PARSER_H

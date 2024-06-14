@@ -5,7 +5,7 @@
 #ifndef LL_TO_UTM_TRANSFORM_H
 #define LL_TO_UTM_TRANSFORM_H
 
-namespace rbf_gnss_ins_driver{
+namespace rbf_gnss_ins_autoware_driver{
 
     class LlToUtmTransform {
     private:
@@ -34,5 +34,5 @@ namespace rbf_gnss_ins_driver{
         Origin m_utm0_;
     };
 
-} // namespace rbf_gnss_ins_driver
+} // namespace rbf_gnss_ins_autoware_driver
 #endif

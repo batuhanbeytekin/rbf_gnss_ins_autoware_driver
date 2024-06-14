@@ -2,8 +2,8 @@
 // Created by elaydin on 06.07.2023.
 //
 
-#include "rbf_gnss_ins_driver/structs.h"
-#include "rbf_gnss_ins_driver/binary_parser.h"
+#include "rbf_gnss_ins_autoware_driver/structs.h"
+#include "rbf_gnss_ins_autoware_driver/binary_parser.h"
 #include <algorithm>
 #include "rclcpp/rclcpp.hpp"
 
@@ -17,7 +17,7 @@ constexpr uint8_t second_synch = 0x44U;
 constexpr uint8_t third_synch = 0x12U;
 constexpr uint16_t crc_len = 4;
 
-namespace rbf_gnss_ins_driver {
+namespace rbf_gnss_ins_autoware_driver {
      static const uint32_t g_aul_crc_table[256] = {
                     0x00000000UL, 0x77073096UL, 0xee0e612cUL, 0x990951baUL, 0x076dc419UL, 0x706af48fUL,
                     0xe963a535UL, 0x9e6495a3UL, 0x0edb8832UL, 0x79dcb8a4UL, 0xe0d5e91eUL, 0x97d2d988UL,
@@ -64,7 +64,7 @@ namespace rbf_gnss_ins_driver {
                     0xb40bbe37UL, 0xc30c8ea1UL, 0x5a05df1bUL, 0x2d02ef8dUL
     };
 
-    static int64_t gps_time_to_unix_time_ns(rbf_gnss_ins_driver::Header& header)
+    static int64_t gps_time_to_unix_time_ns(rbf_gnss_ins_autoware_driver::Header& header)
     {
         int64_t gps_time = (header.ref_week_num * 7 * 24 * 60 * 60) * second_to_nanosecond + (header.week_ms * millisecond_to_nanosecond) + unix_time_offset;
         return gps_time;
@@ -159,4 +159,4 @@ namespace rbf_gnss_ins_driver {
     }
 
 
-} // namespace rbf_gnss_ins_driver
+} // namespace rbf_gnss_ins_autoware_driver
