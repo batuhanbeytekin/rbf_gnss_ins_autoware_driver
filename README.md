@@ -2,7 +2,7 @@
 
 ## Overview
 
-The ROBINS/GNSS INS System ROS2 driver is a software component designed to interface with a Global Navigation Satellite System (GNSS) module combined with an Inertial Navigation System (INS). The driver enables ROS2-based applications to access and utilize the raw GNSS and INS data for localization, navigation, and other related tasks.
+The ROBINS/GNSS INS System ROS2 driver is a software component designed to interface with a Global Navigation Satellite System (GNSS) module combined with an Inertial Navigation System (INS). The driver enables ROS2-based applications to access and utilize the raw GNSS and INS data for localization, navigation, and other related tasks. This driver is also compatible with Autoware, making it suitable for autonomous driving applications.
 
 #### Author: [Robeff Technology](https://www.robeff.com)
 #### Maintainer: [Robeff Technology](mailto:support@robeff.com)
@@ -26,6 +26,7 @@ The ROBINS/GNSS INS System ROS2 driver is a software component designed to inter
 ## Features
 
 - **ROS2 Compatibility**: Fully compatible with the ROS2 (Robot Operating System 2) ecosystem.
+- **Autoware Compatibility**: Fully compatible with Autoware for autonomous driving applications.
 - **GNSS Data**: Reads raw data from the GNSS module, including satellite positions, timestamps, position, velocity, and other relevant information.
 - **INS Data**: Retrieves data from the Inertial Navigation System, such as roll, pitch, and yaw angles.
 - **6-DOF IMU Data**: Provides data from the built-in [ADIS16470](https://www.analog.com/media/en/technical-documentation/data-sheets/adis16470.pdf) 6-DOF IMU.
@@ -58,7 +59,7 @@ Before proceeding with the installation, ensure you have the following prerequis
     source /path_to_your_ros2_ws/install/setup.bash
     ```
 
-    ## Configuration File
+## Configuration File
 
 The `rbf_gnss_ins_driver.param.yaml` configuration file allows customization of the driver's behavior. Below is a table explaining each parameter:
 
@@ -73,7 +74,8 @@ The `rbf_gnss_ins_driver.param.yaml` configuration file allows customization of 
 | ├─ `imu_topic`               | IMU topic name                                   | `robins/ros/imu`              |
 | ├─ `nav_sat_fix_topic`       | NavSatFix topic name                             | `robins/ros/gps_nav_sat_fix`  |
 | ├─ `twist_topic`             | TwistWithCovarianceStamped topic name            | `robins/ros/twist_with_covariance_stamped` |
-| └─ `temperature_topic`       | Temperature topic name                           | `robins/ros/temperature`      |
+| ├─ `temperature_topic`       | Temperature topic name                           | `robins/ros/temperature`      |
+| └─ `gnss_ins_orientation_topic` | GNSS/INS Orientation topic name                | `robins/ros/gnss_ins_orientation` |
 | **frame_config**             |                                                  |                               |
 | ├─ `gnss_frame`              | GNSS frame name                                  | `gnss_ins_link`               |
 | └─ `imu_frame`               | IMU frame name                                   | `imu_link`                    |
@@ -139,6 +141,9 @@ To customize the behavior of the GNSS/INS driver:
 
 ### `RTCMStatus`
 - Status of RTCM topic for debugging.
+
+### `GnssInsOrientationStamped` [autoware_sensing_msgs::msg::GnssInsOrientationStamped](https://github.com/tier4/autoware_sensing_msgs)
+- GNSS/INS orientation information, including roll, pitch, and yaw angles.
 
 ## Standard Messages
 
